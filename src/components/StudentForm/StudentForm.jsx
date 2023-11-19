@@ -1,24 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { createStudent } from '../../api/createStudent';
 import { updateStudent } from '../../api/updateStudent';
+import { getGroups } from '../../api/getGroups'; // Добавляем функцию получения списка групп
 import './StudentForm.css';
 import { useNavigate } from 'react-router-dom';
 
-
 function StudentForm({ student, onSave }) {
   const [formData, setFormData] = useState(student);
-
+  const [groups, setGroups] = useState([]); // Состояние для хранения списка групп
   const navigate = useNavigate();
 
   useEffect(() => {
-    setFormData(student); 
+    setFormData(student);
   }, [student]);
+
+  useEffect(() => {
+    // Загрузка списка групп при монтировании компонента
+    async function fetchGroups() {
+      try {
+        const groupsData = await getGroups();
+        setGroups(groupsData);
+      } catch (error) {
+        console.error('Ошибка при получении списка групп', error);
+      }
+    }
+
+    fetchGroups();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-   
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,12 +41,13 @@ function StudentForm({ student, onSave }) {
       } else {
         await createStudent(formData);
       }
-      navigate("/students")
+      navigate('/students');
       onSave();
     } catch (error) {
       console.error('Ошибка при сохранении студента', error);
     }
   };
+
   
 
 
@@ -84,6 +98,25 @@ function StudentForm({ student, onSave }) {
             value={formData.email}
             onChange={handleChange}
           />
+        </div>
+        <div className="mb-3">
+          <label htmlFor="groupId" className="form-label">
+            Группа:
+          </label>
+          <select
+            className="form-select"
+            id="groupId"
+            name="groupId"
+            value={formData.groupId || ''}
+            onChange={handleChange}
+          >
+            <option value="">Выберите группу</option>
+            {groups.map((group) => (
+              <option key={group.id} value={group.id}>
+                {group.groupName}
+              </option>
+            ))}
+          </select>
         </div>
         <button type="submit" className="btn btn-primary">Сохранить</button>
       </form>

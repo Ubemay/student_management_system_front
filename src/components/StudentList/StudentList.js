@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { getStudents } from "../../api/getStudents";
 import {
   Container,
@@ -10,12 +10,13 @@ import {
 import { Link } from "react-router-dom";
 import { deleteStudent } from "../../api/deleteStudent";
 import { useNavigate } from "react-router-dom";
-import SearchResults from "../../SearchStudents/SearchResults"; // Импорт компонента SearchResults
+import SearchResults from "../../SearchStudents/SearchResults";
+
 
 function StudentList() {
   const [students, setStudents] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // Состояние для хранения поискового запроса
-  const [searching, setSearching] = useState(false); // Состояние для определения, идет ли поиск
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searching, setSearching] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -67,14 +68,14 @@ function StudentList() {
         Add Student
       </Link>
       {searching ? (
-        <SearchResults searchTerm={searchTerm} /> // Передача поискового запроса в SearchResults
+        <SearchResults searchTerm={searchTerm} />
       ) : (
         <List>
           {students.map((student, index) => (
-            <ListItem key={student.id}>
+            <ListItem key={index}> {/* Используйте индекс в качестве ключа */}
               <ListItemText
                 primary={`${index + 1}) ${student.firstname} ${student.lastname}`}
-                secondary={`${student.age} лет`}
+                secondary={`${student.age} лет, Группа: ${student.group.groupName}, Факультет: ${student.group.faculty}`}
               />
               <Link
                 to={`/students/edit/${student.id}`}
